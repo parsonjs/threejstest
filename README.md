@@ -1,10 +1,11 @@
 # threejstest
 install the following dependencies
 
-# three.js
+## three.js
 npm install --save three
 
-# vite
+## vite
 npm install --save-dev vite
 
-NOTE: this code is not well written
+
+## NOTE: this code is not super clean
