@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import Stats from 'stats.js'
 
 //scene setup
 const backgroundColor = 0x000000;
@@ -50,10 +51,14 @@ light2.position.set( 30, -10, 30 );
 scene.add( light2 );
 
 
+//sets up animation mixer, stats, loader, and pauseButton
 var mixer
 const loader = new GLTFLoader();
 loader.crossOrigin = true;
 var pauseButton = document.getElementById('pauseButton');
+var stats = new Stats();
+stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild( stats.dom );
 
 
 /*loads in gltf animations and handles pausing should probably 
@@ -78,12 +83,16 @@ loader.load( 'bee_gltf.gltf', function ( gltf ) {
     scene.add( object );
 });
 
+
 //Continuous function to handle the playback clock
 var clock = new THREE.Clock();
 function animate(){
+  stats.begin();
   requestAnimationFrame(animate);
   var delta = clock.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
+  stats.end();
+  
 }
 animate()
