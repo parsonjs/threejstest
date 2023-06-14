@@ -45,17 +45,24 @@ renderCalls.push(renderScene);
 var light = new THREE.PointLight( 0xffffcc, 20, 200 );
 light.position.set( 4, 30, -20 );
 scene.add( light );
+var light = new THREE.PointLight( 0xffffcc, 20, 200 );
+light.position.set( -130, 100, -190);
+scene.add( light );
 
 var light2 = new THREE.AmbientLight( 0x20202A, 20, 100 );
 light2.position.set( 30, -10, 30 );
 scene.add( light2 );
 
 
-//sets up animation mixer, stats, loader, and pauseButton
-var mixer
+//sets up animation mixer, stats, loader, nextButton and pauseButton
+var mixerMIXER
+var mixerDog
 const loader = new GLTFLoader();
-loader.crossOrigin = true;
-var pauseButton = document.getElementById('pauseButton');
+loader.crossOrigin = false;
+var pauseButtonMIXER = document.getElementById('pauseButtonMIXER');
+var pauseButtonDog = document.getElementById('pauseButtonDog');
+var nextButton = document.getElementById('nextButton');
+
 var stats = new Stats();
 stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild( stats.dom );
@@ -64,23 +71,62 @@ document.body.appendChild( stats.dom );
 /*loads in gltf animations and handles pausing should probably 
 split this into multiple functions
 */
-loader.load( 'bee_gltf.gltf', function ( gltf ) {
-    var object = gltf.scene;
-    object.position.set(0, 0, 0);
-    var isAnimationPaused = false
-    mixer = new THREE.AnimationMixer(gltf.scene);
-    gltf.animations.forEach((clip)=> {
-        mixer.clipAction(clip).play();
-        pauseButton.onclick = function StartAnimation() {
-          if(!isAnimationPaused){
-            isAnimationPaused = true;
-          }else{
-            isAnimationPaused = false;
-          }
-          mixer.clipAction(clip).paused = isAnimationPaused
-      }
-    })
-    scene.add( object );
+
+loader.load( 'MIXER.gltf', function ( gltf ) {
+var object = gltf.scene;
+object.position.set(1.9, -1, -1.5);
+//console.log(object.rotation)
+object.rotation.set(0, -1.5, 0)
+var isAnimationPausedMIXER = false
+mixerMIXER = new THREE.AnimationMixer(gltf.scene);
+
+  var animationNumber = 0;
+  
+  pauseButtonMIXER.onclick = function pauseAnimation() {
+    isAnimationPausedMIXER = !(isAnimationPausedMIXER)
+    console.log(isAnimationPausedMIXER)
+    mixerMIXER.clipAction(gltf.animations[animationNumber]).paused = isAnimationPausedMIXER
+    console.log(animationNumber)
+  }
+  
+  mixerMIXER.update(0)
+  console.log(mixerMIXER.clipAction(gltf.animations[animationNumber]))
+  mixerMIXER.clipAction(gltf.animations[animationNumber]).play();
+  scene.add( object );
+});
+
+
+loader.load( 'doggo-good/source/animated_dog_shiba_inu (1)/scene.gltf', function ( gltf ) {
+  var object = gltf.scene;
+  object.position.set(-0, -70, -150);
+  
+  mixerDog = new THREE.AnimationMixer(gltf.scene);
+
+  var isAnimationPausedDog = false
+  var animationNumber = 2;
+  
+  pauseButtonDog.onclick = function pauseAnimation() {
+    isAnimationPausedDog = !(isAnimationPausedDog)
+    console.log(isAnimationPausedDog)
+    mixerDog.clipAction(gltf.animations[animationNumber]).paused = isAnimationPausedDog
+    
+    console.log(animationNumber)
+  }
+  
+  nextButton.onclick = function nextAnimation() {
+    if(animationNumber == 3){
+      animationNumber = 1;
+    }else{
+      animationNumber++;
+    }
+    mixerDog.stopAllAction() 
+    isAnimationPausedDog = false
+    mixerDog.clipAction(gltf.animations[animationNumber]).play();
+    
+  }
+  mixerDog.update(0)
+  mixerDog.clipAction(gltf.animations[animationNumber]).play();
+  scene.add( object );
 });
 
 
@@ -90,7 +136,9 @@ function animate(){
   stats.begin();
   requestAnimationFrame(animate);
   var delta = clock.getDelta();
-  if (mixer) mixer.update(delta);
+  if (mixerDog) mixerDog.update(delta);
+  if (mixerMIXER) mixerMIXER.update(delta);
+
   renderer.render(scene, camera);
   stats.end();
   
