@@ -55,8 +55,12 @@ scene.add( light2 );
 
 
 //sets up animation mixer, stats, loader, nextButton and pauseButton
+var mixers = [];
+
 var mixerMIXER
 var mixerDog
+
+
 const loader = new GLTFLoader();
 loader.crossOrigin = false;
 var pauseButtonMIXER = document.getElementById('pauseButtonMIXER');
@@ -84,14 +88,12 @@ mixerMIXER = new THREE.AnimationMixer(gltf.scene);
   
   pauseButtonMIXER.onclick = function pauseAnimation() {
     isAnimationPausedMIXER = !(isAnimationPausedMIXER)
-    console.log(isAnimationPausedMIXER)
     mixerMIXER.clipAction(gltf.animations[animationNumber]).paused = isAnimationPausedMIXER
-    console.log(animationNumber)
   }
   
   mixerMIXER.update(0)
-  console.log(mixerMIXER.clipAction(gltf.animations[animationNumber]))
   mixerMIXER.clipAction(gltf.animations[animationNumber]).play();
+  mixers.push(mixerMIXER)
   scene.add( object );
 });
 
@@ -107,10 +109,7 @@ loader.load( 'doggo-good/source/animated_dog_shiba_inu (1)/scene.gltf', function
   
   pauseButtonDog.onclick = function pauseAnimation() {
     isAnimationPausedDog = !(isAnimationPausedDog)
-    console.log(isAnimationPausedDog)
     mixerDog.clipAction(gltf.animations[animationNumber]).paused = isAnimationPausedDog
-    
-    console.log(animationNumber)
   }
   
   nextButton.onclick = function nextAnimation() {
@@ -127,6 +126,7 @@ loader.load( 'doggo-good/source/animated_dog_shiba_inu (1)/scene.gltf', function
   mixerDog.update(0)
   mixerDog.clipAction(gltf.animations[animationNumber]).play();
   scene.add( object );
+  mixers.push(mixerDog)
 });
 
 
@@ -136,8 +136,11 @@ function animate(){
   stats.begin();
   requestAnimationFrame(animate);
   var delta = clock.getDelta();
-  if (mixerDog) mixerDog.update(delta);
-  if (mixerMIXER) mixerMIXER.update(delta);
+  for (let i = 0; i < mixers.length; i++){
+      
+      mixers[i].update(delta);
+      
+  } 
 
   renderer.render(scene, camera);
   stats.end();
